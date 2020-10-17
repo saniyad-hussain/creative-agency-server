@@ -11,7 +11,7 @@ app.use(cors());
 app.use(fileUpload());
 
 const MongoClient = require('mongodb').MongoClient;
-const uri = 'mongodb+srv://creativeUser:UvklQEsjZExuIYgF@cluster0.zjgsq.mongodb.net/creativeAgency?retryWrites=true&w=majority';
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zjgsq.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect((err) => {
@@ -20,14 +20,11 @@ client.connect((err) => {
 	const adminCollection = client.db('creativeAgency').collection('admins');
 	const reviewCollection = client.db('creativeAgency').collection('reviews');
 
-	//API's For Services
-	//Add new Service to database
 	app.post('/addService', (req, res) => {
 		const file = req.files.file;
 		const title = req.body.title;
 		const description = req.body.description;
 
-		//encodeing Image
 		const newImg = file.data;
 		const encImg = newImg.toString('base64');
 		var image = {
@@ -40,21 +37,19 @@ client.connect((err) => {
 			res.send(result.insertedCount > 0);
 		});
 	});
-	// Get Services from database
+
 	app.get('/services', (req, res) => {
 		serviceCollection.find({}).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
-	// Get The Orderd Service's Name
+
 	app.get('/serviceOrder/:id', (req, res) => {
 		serviceCollection.find({ _id: ObjectID(req.params.id) }).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
 
-	//API's for Orders
-	//Post Order to Database
 	app.post('/postOrder', (req, res) => {
 		const file = req.files.file;
 		const name = req.body.name;
@@ -64,7 +59,6 @@ client.connect((err) => {
 		const price = req.body.price;
 		const status = req.body.status;
 
-		//encodeing Image
 		const newImg = file.data;
 		const encImg = newImg.toString('base64');
 		var image = {
@@ -76,19 +70,19 @@ client.connect((err) => {
 			res.send(result.insertedCount > 0);
 		});
 	});
-	//Get Order Data By Email
+
 	app.get('/getServiceByEmail', (req, res) => {
 		orderCollection.find({ email: req.query.email }).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
-	//Get All Order Data
+
 	app.get('/getAllService', (req, res) => {
 		orderCollection.find({}).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
-	//Update Order Status
+
 	app.patch('/updateStatus', (req, res) => {
 		console.log(req.query.id);
 		const newStatus = req.body.status;
@@ -98,30 +92,25 @@ client.connect((err) => {
 		});
 	});
 
-	//API's for Admins
-	//Make new Admin
 	app.post('/makeAdmin', (req, res) => {
 		const newOrder = req.body;
 		adminCollection.insertOne(newOrder).then((result) => {
 			res.send(result.insertedCount > 0);
 		});
 	});
-	//Find Admin by Email
+
 	app.get('/findAdminByEmail', (req, res) => {
 		adminCollection.find({ email: req.query.email }).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
 
-	//API's for Review
-	//Add new Review with Image to database
 	app.post('/addReview', (req, res) => {
 		const file = req.files.file;
 		const name = req.body.name;
 		const designation = req.body.designation;
 		const comment = req.body.comment;
 
-		//encodeing Image
 		const newImg = file.data;
 		const encImg = newImg.toString('base64');
 		var image = {
@@ -135,7 +124,6 @@ client.connect((err) => {
 		});
 	});
 
-	//Get reviews to frontEnd
 	app.get('/reviews', (req, res) => {
 		reviewCollection.find({}).toArray((err, documents) => {
 			res.send(documents);
