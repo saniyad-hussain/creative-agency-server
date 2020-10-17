@@ -131,6 +131,6 @@ client.connect((err) => {
 	});
 });
 
-app.listen(port, () => {
-	console.log(`Running`);
+app.listen(process.env.PORT || port, () => {
+	console.log('OK');
 });
